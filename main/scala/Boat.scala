@@ -1,4 +1,4 @@
-class Boat(var life: Int, var listPos: List[List[Int]]){
+case class Boat(var life: Int, var listPos: List[List[Int]]){
 
 
 	def isInTheGrid(gridSize: Int, newListPos: List[List[Int]]): Boolean = {
@@ -23,4 +23,22 @@ class Boat(var life: Int, var listPos: List[List[Int]]){
 		}
 
 	}
+
+	def boatOverlapping(boat: Boat, listPos:List[List[Int]]){
+		listPos match{
+			case Nil => {
+				true
+			}
+			case a::b => {
+				if(boat.listPos.contains(a)){
+					boatOverlapping(listPos.tail)
+				}
+				else{
+					false
+				}
+			}
+			case _ => false
+		}
+	}
+
 }
