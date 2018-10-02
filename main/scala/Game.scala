@@ -6,7 +6,7 @@ object Game extends App{
 
 	def displayColumns(colums: Int): Unit = {
 		if(colums>0){
-			print("| ")
+			print("|_")
 			displayColumns(colums-1)
 		}
 		else{
