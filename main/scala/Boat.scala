@@ -1,5 +1,6 @@
 class Boat(var life: Int, var listPos: List[List[Int]]){
 
+
 	def isInTheGrid(gridSize: Int, newListPos: List[List[Int]]): Boolean = {
 		newListPos match{
 			case (a :: (b :: Nil))::Nil => {
@@ -21,12 +22,5 @@ class Boat(var life: Int, var listPos: List[List[Int]]){
 			case _ => false
 		}
 
-	}
-
-	def hasGoodPos(newListPos: List[List[Int]]): Boolean = {
-		/*newListPos match{
-			case
-		}*/
-		return true
 	}
 }
