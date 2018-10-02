@@ -1,1 +1,3 @@
-class Player()
+class Player(name: String, boatList: List[Boat]){
+	
+}
