@@ -1,24 +1,24 @@
 object Game extends App{
 	def mainloop(){
-		val input = readLine("choisir nom")
-		val b = new Boat(3, List(List(3,24), List(2,1)))
-		println(b.isInTheGrid(20, b.listPos))
-
-
+		displayLines(10, 10)
 	}
 	mainloop()
 
-
-	def display(colums: Int, lines: Int){
-
-	}
-
-	def displayColumns(colums: Int){
-		if(colums==0){
-			
+	def displayColumns(colums: Int): Unit = {
+		if(colums>0){
+			print("| ")
+			displayColumns(colums-1)
+		}
+		else{
+			print("|")
 		}
 	}
 
-	def displayLines()
-
+	def displayLines(colums: Int, lines: Int): Unit = {
+		if(lines>0){
+			displayColumns(colums)
+			println("")
+			displayLines(colums, lines-1)
+		}
+	}
 }
