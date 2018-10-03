@@ -11,8 +11,7 @@ object Game extends App{
 				val p1 = addFleetToPlayer(List(b1, b2), 0)
 				println(p1.fleet)
 				val p2 = p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x)
-				println(p2.zipWithIndex.collect{ case ( x, i) if i%2==0 => x})
-
+				displayLines(10, 10, p2)
 			}
 			case "2" =>	{
 
@@ -112,22 +111,29 @@ object Game extends App{
 			
 	}
 
-	def displayColumns(colums: Int): Unit = {
-
+	def displayColumns(colums: Int, posBoat: List[Int] = List()): Unit = {
 		if(colums>0){
-			print("|_")
-			displayColumns(colums-1)
+			if(posBoat.contains(11-colums)){
+				print("|o")
+			}
+			else{
+				print("|_")
+			}
+			displayColumns(colums-1, posBoat)
 		}
 		else{
 			print("|")
 		}
 	}
 
-	def displayLines(colums: Int, lines: Int): Unit = {
+	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List()): Unit = {
 		if(lines>0){
-			displayColumns(colums)
+			val l1 = posBoat.zipWithIndex.collect{ case ( x, i) if (i%2==1 && x==11-lines) => i}
+			//if(!(l1.isEmpty)){
+			val l2 = posBoat.zipWithIndex.collect{ case ( x, i) if l1.contains(i+1) => x}
+			displayColumns(colums, l2)
 			println("")
-			displayLines(colums, lines-1)
+			displayLines(colums, lines-1, posBoat)
 		}
 	}
 
