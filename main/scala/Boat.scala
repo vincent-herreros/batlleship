@@ -24,17 +24,17 @@ case class Boat(var life: Int, var listPos: List[List[Int]]){
 
 	}
 
-	def boatOverlapping(boat: Boat, listPos:List[List[Int]]){
+	def isOverlapping(boat: Boat, listPos:List[List[Int]]): Boolean={
 		listPos match{
 			case Nil => {
 				true
 			}
 			case a::b => {
 				if(boat.listPos.contains(a)){
-					boatOverlapping(listPos.tail)
+					false
 				}
 				else{
-					false
+					isOverlapping(boat, listPos.tail)
 				}
 			}
 			case _ => false

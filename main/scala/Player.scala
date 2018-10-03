@@ -1,3 +1,3 @@
-class Player(name: String, boatList: List[Boat]){
+case class Player(name: String, fleet: List[Boat]){
 	
 }

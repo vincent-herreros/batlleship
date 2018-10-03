@@ -1,18 +1,17 @@
 object Game extends App{
 	def mainloop(){
 		val list1 = List(List(1,2), List(3,4))
-		val list2 = List(List(3,4), List(5,4))
-		println(list1.contains(list2.head))
+		val list2 = List(List(2,4), List(5,4))
+		val b1 = new Boat(2, list1)
+		val b2 = new Boat(2, list2)
 		menu()
 		val inputMenu = readLine("")
 		inputMenu match{
 			case "1" =>	{
-				val inputBoatx = readLine().toInt
-				val inputBoaty = readLine().toInt
-				val orientation = readLine()
-				val b = createBoat(orientation, 3, List(List(inputBoatx, inputBoaty)))
-				println(b.isInTheGrid(10, b.listPos))
-				println(b.listPos)
+				val p1 = addFleetToPlayer(List(b1, b2), 0)
+				println(p1.fleet)
+				val p2 = p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x)
+				println(p2.zipWithIndex.collect{ case ( x, i) if i%2==0 => x})
 
 			}
 			case "2" =>	{
@@ -24,29 +23,52 @@ object Game extends App{
 	mainloop()
 
 	def addFleetToPlayer(fleet: List[Boat], iterator: Int): Player = {
-		iterator match{
+		if(iterator>0){
+			iterator match{
 			case 5 => {
-				val life = 2
-				println("Ajoutez un bateau de 2")
-			}
-			case 4 | 3 => {
-				val life = 3
-				println("Ajoutez un bateau de 3")
-			}
-			case 2 => {
-				val life = 4
-				println("Ajoutez un bateau de 4")
-			}
-			case 1 => {
-				val life = 5
 				println("Ajoutez un bateau de 5")
 			}
+			case 4 => {
+				println("Ajoutez un bateau de 4")
+			}
+			case 2 | 3 => {
+				println("Ajoutez un bateau de 3")
+			}
+			case 1 => {
+				println("Ajoutez un bateau de 2")
+			}
+			case _ => {
+
+			}
 		}
+		val inputBoatx = readLine().toInt
+		val inputBoaty = readLine().toInt
+		val orientation = readLine()
+		iterator match{
+			case 2 | 1 => {
+				val boat = createBoat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
+				addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+			}
+			case _ =>{
+				val boat = createBoat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
+				addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+			}
+		}
+		}
+		else{
+			new Player("hh", fleet)
+
+		}
+		
 	}
 
 	def addToFleet(fleet: List[Boat], boat: Boat): List[Boat] = {
-		if(verifFleet(fleet, boat)) boat::fleet
-		else fleet
+		if(verifFleet(fleet, boat)){
+			boat::fleet
+		} 
+		else {
+			fleet
+		}
 	}
 
 	def verifFleet(fleet: List[Boat], boat: Boat): Boolean ={
@@ -91,6 +113,7 @@ object Game extends App{
 	}
 
 	def displayColumns(colums: Int): Unit = {
+
 		if(colums>0){
 			print("|_")
 			displayColumns(colums-1)
