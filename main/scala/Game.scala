@@ -21,7 +21,18 @@ object Game extends App{
 	}
 	mainloop()
 
-	def addFleetToPlayer(fleet: List[Boat], iterator: Int): Player = {
+	def gameloop(player1: Player, player2: Player){
+
+	}
+
+	def startGameloop(): Player = {
+		println("Entrez votre nom")
+		val name = readLine()
+		val fleet = addFleetToPlayer(List(), 5)
+		return new Player(name, fleet)
+	}
+
+	def addFleetToPlayer(fleet: List[Boat], iterator: Int): List[Boat] = {
 		if(iterator>0){
 			iterator match{
 			case 5 => {
@@ -43,16 +54,16 @@ object Game extends App{
 		val inputBoatx = readLine().toInt
 		val inputBoaty = readLine().toInt
 		val orientation = readLine()
-		iterator match{
-			case 2 | 1 => {
-				val boat = createBoat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
-				addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+			iterator match{
+				case 2 | 1 => {
+					val boat = createBoat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
+					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+				}
+				case _ =>{
+					val boat = createBoat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
+					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+				}
 			}
-			case _ =>{
-				val boat = createBoat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
-				addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
-			}
-		}
 		}
 		else{
 			new Player("hh", fleet)
