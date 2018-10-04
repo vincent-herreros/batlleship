@@ -24,17 +24,18 @@ object Game extends App{
 	mainloop()
 
 	def gameloop(p1: Player, p2: Player){
-		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), true)
-		displayLines(10, 10, p1.shoots.flatMap(x => x), false)
+		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List())
+		displayLines(10, 10, List(), p1.shoots)
 		val shootx = readLine().toInt
 		val shooty = readLine().toInt
 		val newp2 = p1.shoot(List(shootx,shooty), p2)
-		val newp1 = p1.copy(shoots = List(1,2)::p1.shoots)
 		if(newp2.isEmpty){
+			val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
 			println("Pas de touche")
 			gameloop(p2, newp1)
 		}
 		else{
+			val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
 			println("touche")
 			gameloop(newp2.get, newp1)
 		}
@@ -123,34 +124,61 @@ object Game extends App{
 	}
 
 
-	def displayColumns(colums: Int, posBoat: List[Int] = List(), boatOrShoot: Boolean): Unit = {
+	def displayColumns(colums: Int, posBoat: List[Int] = List(), hits: List[Hit] = List(), nextHits: List[Hit] = List(), hitOrBoat: Boolean): Unit = {
 		if(colums>0){
-			if(posBoat.contains(11-colums)){
-				if(boatOrShoot){
+			if(hitOrBoat){
+				hits match{
+					case Nil =>{
+						displayColumns(colums-1, List(), nextHits, List(), true)
+						print("|_")
+					}
+					case a::b =>{
+						if(a.pos(1)==11-colums){
+							if(a.hitOrNot){
+								print("|h")
+							}
+							else{
+								print("|x")
+							}
+							displayColumns(colums-1, List(),hits.tail:::nextHits, List(), true)
+						}
+						else{
+							displayColumns(colums, List(), hits.tail, List(a), true)
+						}
+					}
+				}
+			}
+			else{
+				if(posBoat.contains(11-colums)){
 					print("|o")
 				}
 				else{
-					print("|x")
+					print("|_")
 				}
-				
+				displayColumns(colums-1, posBoat, List(), List(), false)
 			}
-			else{
-				print("|_")
-			}
-			displayColumns(colums-1, posBoat, boatOrShoot)
 		}
 		else{
 			print("|")
 		}
+		
 	}
 
-	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), boatOrShoot: Boolean): Unit = {
-		if(lines>0){
-			val l1 = posBoat.zipWithIndex.collect{ case ( x, i) if (i%2==1 && x==11-lines) => i}
-			val l2 = posBoat.zipWithIndex.collect{ case ( x, i) if l1.contains(i+1) => x}
-			displayColumns(colums, l2, boatOrShoot)
-			println("")
-			displayLines(colums, lines-1, posBoat, boatOrShoot)
+	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), hits: List[Hit] = List()): Unit = {
+		if (lines>0){
+			if(posBoat.isEmpty){
+				val l1 = hits.collect{case x if x.pos(1)==11-lines => x}
+				displayColumns(colums, List(), l1, List(), true)
+				println("")
+				displayLines(colums, lines-1, List() ,hits)
+			}
+			else{
+				val l1 = posBoat.zipWithIndex.collect{ case ( x, i) if (i%2==1 && x==11-lines) => i}
+				val l2 = posBoat.zipWithIndex.collect{ case ( x, i) if l1.contains(i+1) => x}
+				displayColumns(colums, l2, List(), List(),false)
+				println("")
+				displayLines(colums, lines-1, posBoat, List())
+			}
 		}
 		else{
 			println("")

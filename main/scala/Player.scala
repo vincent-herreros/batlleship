@@ -1,6 +1,7 @@
-case class Player(name: String, fleet: List[Boat], shoots: List[List[Int]] = List(List())){
+case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List()){
 
 	def shoot(posShoot: List[Int], enemyP: Player): Option[Player] = {
+		val posHits = shoots.map(x =>x.pos)
 		if(shoots.contains(posShoot)){
 			None
 		}
@@ -36,3 +37,5 @@ case class Player(name: String, fleet: List[Boat], shoots: List[List[Int]] = Lis
 
 
 }
+
+case class Hit(var pos: List[Int], var hitOrNot: Boolean)
