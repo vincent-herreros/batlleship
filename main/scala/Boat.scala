@@ -1,4 +1,5 @@
-class Boat(var life: Int, var listPos: List[List[Int]]){
+case class Boat(var life: Int, var listPos: List[List[Int]]){
+
 
 	def isInTheGrid(gridSize: Int, newListPos: List[List[Int]]): Boolean = {
 		newListPos match{
@@ -23,10 +24,49 @@ class Boat(var life: Int, var listPos: List[List[Int]]){
 
 	}
 
-	def hasGoodPos(newListPos: List[List[Int]]): Boolean = {
-		/*newListPos match{
-			case
-		}*/
-		return true
+	def isOverlapping(boat: Boat, listPos:List[List[Int]]): Boolean={
+		listPos match{
+			case Nil => {
+				true
+			}
+			case a::b => {
+				if(boat.listPos.contains(a)){
+					false
+				}
+				else{
+					isOverlapping(boat, listPos.tail)
+				}
+			}
+			case _ => false
+		}
+	}
+
+}
+
+object Boat {
+	def apply(orientation: String, life: Int, listPos: List[List[Int]]): Option[Boat] = {
+		if(life>1){
+			orientation match{
+				case "v" => {
+					val x = listPos.head(0)
+					val y = listPos.head(1)+1
+					apply(orientation, life-1, List(x, y)::listPos)
+				}
+				case "h" => {
+					val x = listPos.head(0)+1
+					val y = listPos.head(1)
+					apply(orientation, life-1, List(x, y)::listPos)
+				}
+			}
+		}
+		else{
+			val boat = new Boat(listPos.length, listPos)
+			if(boat.isInTheGrid(10, listPos)){
+				Some(boat)
+			}
+			else{
+				None
+			}
+		}
 	}
 }
