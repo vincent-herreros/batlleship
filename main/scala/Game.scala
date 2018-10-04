@@ -8,7 +8,7 @@ object Game extends App{
 		val inputMenu = readLine("")
 		inputMenu match{
 			case "1" =>	{
-				val p1 = addFleetToPlayer(List(b1, b2), 0)
+				val p1 = startGameloop()
 				println(p1.fleet)
 				val p2 = p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x)
 				displayLines(10, 10, p2)
@@ -56,29 +56,36 @@ object Game extends App{
 		val orientation = readLine()
 			iterator match{
 				case 2 | 1 => {
-					val boat = createBoat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
-					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+					val boat = Boat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
+					val newfleet = addToFleet(fleet, boat)
+					addFleetToPlayer(newfleet, iterator-1)
 				}
 				case _ =>{
-					val boat = createBoat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
+					val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
 					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
 				}
 			}
 		}
 		else{
-			new Player("hh", fleet)
+			fleet
 
 		}
 		
 	}
 
-	def addToFleet(fleet: List[Boat], boat: Boat): List[Boat] = {
-		if(verifFleet(fleet, boat)){
-			boat::fleet
-		} 
-		else {
+	def addToFleet(fleet: List[Boat], boat: Option[Boat]): List[Boat] = {
+		if(boat.isEmpty){
 			fleet
 		}
+		else{
+			if(verifFleet(fleet, boat.get)){
+			boat.get::fleet
+			} 
+			else {
+				fleet
+			}
+		}
+		
 	}
 
 	def verifFleet(fleet: List[Boat], boat: Boat): Boolean ={
@@ -100,27 +107,6 @@ object Game extends App{
 		}
 	}
 
-
-	def createBoat(orientation: String, life: Int, listPos: List[List[Int]]): Boat ={
-		if(life>1){
-			orientation match{
-				case "v" => {
-					val x = listPos.head(0)
-					val y = listPos.head(1)+1
-					createBoat(orientation, life-1, List(x, y)::listPos)
-				}
-				case "h" => {
-					val x = listPos.head(0)+1
-					val y = listPos.head(1)
-					createBoat(orientation, life-1, List(x, y)::listPos)
-				}
-			}
-		}
-		else{
-			new Boat(listPos.length, listPos)
-		}
-			
-	}
 
 	def displayColumns(colums: Int, posBoat: List[Int] = List()): Unit = {
 		if(colums>0){
