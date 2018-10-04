@@ -1,17 +1,19 @@
 object Game extends App{
 	def mainloop(){
-		val list1 = List(List(1,2), List(3,4))
-		val list2 = List(List(2,4), List(5,4))
-		val b1 = new Boat(2, list1)
-		val b2 = new Boat(2, list2)
+		val list1 = List(List(1,2), List(1,3), List(1,4))
+		val list2 = List(List(5,4), List(6,4), List(7,4))
+		val b1 = Boat(3, list1)
+		val b2 = Boat(3, list2)
 		menu()
 		val inputMenu = readLine("")
 		inputMenu match{
 			case "1" =>	{
-				val p1 = startGameloop()
+				val p1 = new Player("1", List(b1, b2))
+				val p2 = new Player("2", List(b1, b2))
+				//val p1 = startGameloop()
 				println(p1.fleet)
-				val p2 = p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x)
-				displayLines(10, 10, p2)
+				//val p2 = startGameloop()
+				gameloop(p1, p2)
 			}
 			case "2" =>	{
 
@@ -21,7 +23,10 @@ object Game extends App{
 	}
 	mainloop()
 
-	def gameloop(player1: Player, player2: Player){
+	def gameloop(p1: Player, p2: Player){
+		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x))
+		displayLines(10, 10)
+		p1.shoot(List(1,1), p2)
 
 	}
 
@@ -131,6 +136,9 @@ object Game extends App{
 			displayColumns(colums, l2)
 			println("")
 			displayLines(colums, lines-1, posBoat)
+		}
+		else{
+			println("")
 		}
 	}
 
