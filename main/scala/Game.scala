@@ -24,10 +24,20 @@ object Game extends App{
 	mainloop()
 
 	def gameloop(p1: Player, p2: Player){
-		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x))
-		displayLines(10, 10)
-		p1.shoot(List(1,1), p2)
-
+		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), true)
+		displayLines(10, 10, p1.shoots.flatMap(x => x), false)
+		val shootx = readLine().toInt
+		val shooty = readLine().toInt
+		val newp2 = p1.shoot(List(shootx,shooty), p2)
+		val newp1 = p1.copy(shoots = List(1,2)::p1.shoots)
+		if(newp2.isEmpty){
+			println("Pas de touche")
+			gameloop(p2, newp1)
+		}
+		else{
+			println("touche")
+			gameloop(newp2.get, newp1)
+		}
 	}
 
 	def startGameloop(): Player = {
@@ -113,29 +123,34 @@ object Game extends App{
 	}
 
 
-	def displayColumns(colums: Int, posBoat: List[Int] = List()): Unit = {
+	def displayColumns(colums: Int, posBoat: List[Int] = List(), boatOrShoot: Boolean): Unit = {
 		if(colums>0){
 			if(posBoat.contains(11-colums)){
-				print("|o")
+				if(boatOrShoot){
+					print("|o")
+				}
+				else{
+					print("|x")
+				}
+				
 			}
 			else{
 				print("|_")
 			}
-			displayColumns(colums-1, posBoat)
+			displayColumns(colums-1, posBoat, boatOrShoot)
 		}
 		else{
 			print("|")
 		}
 	}
 
-	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List()): Unit = {
+	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), boatOrShoot: Boolean): Unit = {
 		if(lines>0){
 			val l1 = posBoat.zipWithIndex.collect{ case ( x, i) if (i%2==1 && x==11-lines) => i}
-			//if(!(l1.isEmpty)){
 			val l2 = posBoat.zipWithIndex.collect{ case ( x, i) if l1.contains(i+1) => x}
-			displayColumns(colums, l2)
+			displayColumns(colums, l2, boatOrShoot)
 			println("")
-			displayLines(colums, lines-1, posBoat)
+			displayLines(colums, lines-1, posBoat, boatOrShoot)
 		}
 		else{
 			println("")
