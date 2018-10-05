@@ -4,7 +4,7 @@ case class Boat(var life: Int, var listPos: List[List[Int]]){
 	def isInTheGrid(gridSize: Int, newListPos: List[List[Int]]): Boolean = {
 		newListPos match{
 			case (a :: (b :: Nil))::Nil => {
-				if(a<=20 && b<=20 && a>0 && b>0){
+				if(a<=10 && b<=10 && a>0 && b>0){
 					true
 				}
 				else{
@@ -12,7 +12,7 @@ case class Boat(var life: Int, var listPos: List[List[Int]]){
 				}
 			}
 			case (a :: (b :: Nil))::c => {
-				if(a<=20 && b<=20 && a>0 && b>0){
+				if(a<=10 && b<=10 && a>0 && b>0){
 					isInTheGrid(gridSize, newListPos.tail)
 				}
 				else{

@@ -1,35 +1,49 @@
 object Game extends App{
-	def mainloop(){
-		val list1 = List(List(1,2), List(1,3), List(1,4))
+
+	val list1 = List(List(1,2), List(1,3), List(1,4))
 		val list2 = List(List(5,4), List(6,4), List(7,4))
 		val b1 = Boat(3, list1)
 		val b2 = Boat(3, list2)
-		menu()
+		println("Choose your game mode")
+		println("Player VS Player : 1")
+		println("Player VS AI : 2")
+		println("AI VS AI")
+		println("Quit : q")
 		val inputMenu = readLine("")
 		inputMenu match{
 			case "1" =>	{
-				val p1 = new Player("1", List(b1, b2))
-				val p2 = new Player("2", List(b1, b2))
-				//val p1 = startGameloop()
-				println(p1.fleet)
-				//val p2 = startGameloop()
-				gameloop(p1, p2)
+				println("Nom du premier joueur : ")
+				val input1 = readLine()
+				println("Nom du deuxième joueur : ")
+				val input2 = readLine()
+				val p1 = new Player(input1, List(), List())
+				val p2 = new Player(input1, List(), List())
+				mainloop(p1, p2) 
 			}
 			case "2" =>	{
 
 			}
-			case _ => 
-		}
-	}
-	mainloop()
+			case "3" => {
 
-	def gameloop(p1: Player, p2: Player){
+			}
+			case _ => {
+			}
+		}
+
+	def mainloop(p1: Player, p2: Player): Unit= {
+		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(), 2))
+		val newp2 = new Player(p2.name, p2.addFleetToPlayer(List(), 2))
+
+		gameloop(newp1, newp2)
+	}
+
+	def gameloop(p1: Player, p2: Player): Unit = {
 		if(p1.fleet.isEmpty){
 			println(p1.name+" loose")
 		}
 		else{
-			displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List())
-			displayLines(10, 10, List(), p1.shoots)
+			displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List(), false)
+			displayLines(10, 10, List(), p1.shoots, true)
 			val shootx = readLine().toInt
 			val shooty = readLine().toInt
 			val newp2 = p1.shoot(List(shootx,shooty), p2)
@@ -41,92 +55,11 @@ object Game extends App{
 			else{
 				val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
 				println("touche")
-				gameloop(newp2.get, newp1)
+				val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
+				gameloop(newp3, newp1)
 			}
 		}
 		
-	}
-
-	def startGameloop(): Player = {
-		println("Entrez votre nom")
-		val name = readLine()
-		val fleet = addFleetToPlayer(List(), 5)
-		return new Player(name, fleet)
-	}
-
-	def addFleetToPlayer(fleet: List[Boat], iterator: Int): List[Boat] = {
-		if(iterator>0){
-			iterator match{
-			case 5 => {
-				println("Ajoutez un bateau de 5")
-			}
-			case 4 => {
-				println("Ajoutez un bateau de 4")
-			}
-			case 2 | 3 => {
-				println("Ajoutez un bateau de 3")
-			}
-			case 1 => {
-				println("Ajoutez un bateau de 2")
-			}
-			case _ => {
-
-			}
-		}
-		val inputBoatx = readLine().toInt
-		val inputBoaty = readLine().toInt
-		val orientation = readLine()
-			iterator match{
-				case 2 | 1 => {
-					val boat = Boat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
-					val newfleet = addToFleet(fleet, boat)
-					addFleetToPlayer(newfleet, iterator-1)
-				}
-				case _ =>{
-					val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
-					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
-				}
-			}
-		}
-		else{
-			fleet
-
-		}
-		
-	}
-
-	def addToFleet(fleet: List[Boat], boat: Option[Boat]): List[Boat] = {
-		if(boat.isEmpty){
-			fleet
-		}
-		else{
-			if(verifFleet(fleet, boat.get)){
-			boat.get::fleet
-			} 
-			else {
-				fleet
-			}
-		}
-		
-	}
-
-	def verifFleet(fleet: List[Boat], boat: Boat): Boolean ={
-		fleet match {
-			case Nil => {
-				true
-			}
-			case a::b =>{
-				if(boat.isOverlapping(a, boat.listPos)){
-					verifFleet(fleet.tail, boat)
-				}
-				else{
-					false
-				}
-			}
-			case _ => {
-				false
-			}
-		}
 	}
 
 
@@ -135,21 +68,21 @@ object Game extends App{
 			if(hitOrBoat){
 				hits match{
 					case Nil =>{
-						displayColumns(colums-1, List(), nextHits, List(), true)
 						print("|_")
+						displayColumns(colums-1, List(), nextHits, List(), hitOrBoat)
 					}
 					case a::b =>{
-						if(a.pos(1)==11-colums){
+						if(a.pos(0)==11-colums){
 							if(a.hitOrNot){
 								print("|h")
 							}
 							else{
 								print("|x")
 							}
-							displayColumns(colums-1, List(),hits.tail:::nextHits, List(), true)
+							displayColumns(colums-1, List(),hits.tail:::nextHits, List(), hitOrBoat)
 						}
 						else{
-							displayColumns(colums, List(), hits.tail, List(a), true)
+							displayColumns(colums, List(), hits.tail, List(a), hitOrBoat)
 						}
 					}
 				}
@@ -161,7 +94,7 @@ object Game extends App{
 				else{
 					print("|_")
 				}
-				displayColumns(colums-1, posBoat, List(), List(), false)
+				displayColumns(colums-1, posBoat, List(), List(), hitOrBoat)
 			}
 		}
 		else{
@@ -169,32 +102,28 @@ object Game extends App{
 		}
 	}
 
-	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), hits: List[Hit] = List()): Unit = {
+	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), hits: List[Hit] = List(), hitOrBoat:Boolean): Unit = {
+		if(lines==10){
+			println(" _ _ _ _ _ _ _ _ _ _")
+		}
 		if (lines>0){
-			if(posBoat.isEmpty){
+			if(hitOrBoat){
 				val l1 = hits.collect{case x if x.pos(1)==11-lines => x}
-				displayColumns(colums, List(), l1, List(), true)
+				displayColumns(colums, List(), l1, List(), hitOrBoat)
 				println("")
-				displayLines(colums, lines-1, List() ,hits)
+				displayLines(colums, lines-1, List() ,hits, hitOrBoat)
 			}
 			else{
 				val l1 = posBoat.zipWithIndex.collect{ case ( x, i) if (i%2==1 && x==11-lines) => i}
 				val l2 = posBoat.zipWithIndex.collect{ case ( x, i) if l1.contains(i+1) => x}
-				displayColumns(colums, l2, List(), List(),false)
+				displayColumns(colums, l2, List(), List(),hitOrBoat)
 				println("")
-				displayLines(colums, lines-1, posBoat, List())
+				displayLines(colums, lines-1, posBoat, List(), hitOrBoat)
 			}
 		}
 		else{
 			println("")
 		}
-	}
-
-	def menu(): Unit = {
-		println("Choose your game mode")
-		println("Player VS Player : 1")
-		println("Player VS AI : 2")
-		println("Quit : q")
 	}
 
 }
