@@ -24,21 +24,27 @@ object Game extends App{
 	mainloop()
 
 	def gameloop(p1: Player, p2: Player){
-		displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List())
-		displayLines(10, 10, List(), p1.shoots)
-		val shootx = readLine().toInt
-		val shooty = readLine().toInt
-		val newp2 = p1.shoot(List(shootx,shooty), p2)
-		if(newp2.isEmpty){
-			val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
-			println("Pas de touche")
-			gameloop(p2, newp1)
+		if(p1.fleet.isEmpty){
+			println(p1.name+" loose")
 		}
 		else{
-			val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
-			println("touche")
-			gameloop(newp2.get, newp1)
+			displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List())
+			displayLines(10, 10, List(), p1.shoots)
+			val shootx = readLine().toInt
+			val shooty = readLine().toInt
+			val newp2 = p1.shoot(List(shootx,shooty), p2)
+			if(newp2.isEmpty){
+				val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
+				println("Pas de touche")
+				gameloop(p2, newp1)
+			}
+			else{
+				val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
+				println("touche")
+				gameloop(newp2.get, newp1)
+			}
 		}
+		
 	}
 
 	def startGameloop(): Player = {
@@ -161,7 +167,6 @@ object Game extends App{
 		else{
 			print("|")
 		}
-		
 	}
 
 	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), hits: List[Hit] = List()): Unit = {
