@@ -1,4 +1,6 @@
-case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List()){
+import scala.util.Random
+
+case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), level: Int= 0){
 
 	def shoot(posShoot: List[Int], enemyP: Player): Option[Player] = {
 		val posHits = shoots.map(x =>x.pos)
@@ -9,12 +11,37 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List()){
 			val enemyList = enemyP.fleet.map(x => (x.life, x.listPos)).collect{ case (x, y) => y}.flatMap(x => x)
 			if(enemyList.contains(posShoot)){
 				Some(enemyP.boatShoot(posShoot, enemyP.fleet))
-				
+
 			}
 			else{
 				None
 			}
 		}
+	}
+
+	def shootAI(random: Random): List[Int] ={
+		this.level match{
+			case 1 => {
+				List(random.nextInt(10)+1, random.nextInt(10)+1)
+			}
+				case 2 => {
+					val posShoot = List(random.nextInt(10)+1, random.nextInt(10)+1)
+					val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)
+					if(posHits.contains(posShoot)){
+						shootAI(new Random(random.nextInt()))
+					}
+					else{
+						posShoot
+					}
+				}
+				case x>2 => {
+					if(this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => y}.contains(true)){
+
+					}
+				}
+		}
+
+
 	}
 
 	def boatShoot(posShoot: List[Int], fleet: List[Boat], nextFleet: List[Boat] = List()): Player = {
@@ -30,42 +57,83 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List()){
 				else{
 					boatShoot(posShoot, fleet.tail, fleet.head::nextFleet)
 				}
-				
+
 			}
 		}
 	}
 
-	def addFleetToPlayer(fleet: List[Boat], iterator: Int): List[Boat] = {
-		if(iterator>0){
-			iterator match{
-			case 5 => {
-				println("Ajoutez un bateau de 5")
-			}
-			case 4 => {
-				println("Ajoutez un bateau de 4")
-			}
-			case 2 | 3 => {
-				println("Ajoutez un bateau de 3")
-			}
-			case 1 => {
-				println("Ajoutez un bateau de 2")
-			}
-			case _ => {
+	def addFleetToPlayer(fleet: List[Boat], iterator: Int, random: Random): List[Boat] = {
+		if(iterator>0) {
+			val listOr = Array("h", "v")
+			if (this.level==0) {
+				iterator match {
+					case 5 => {
+						println("Ajoutez un bateau de 5")
+					}
+					case 4 => {
+						println("Ajoutez un bateau de 4")
+					}
+					case 2 | 3 => {
+						println("Ajoutez un bateau de 3")
+					}
+					case 1 => {
+						println("Ajoutez un bateau de 2")
+					}
+					case _ => {
 
-			}
-		}
-		val inputBoatx = readLine().toInt
-		val inputBoaty = readLine().toInt
-		val orientation = readLine()
-			iterator match{
-				case 2 | 1 => {
-					val boat = Boat(orientation, iterator+1, List(List(inputBoatx, inputBoaty)))
-					val newfleet = addToFleet(fleet, boat)
-					addFleetToPlayer(newfleet, iterator-1)
+					}
 				}
-				case _ =>{
-					val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
-					addFleetToPlayer(addToFleet(fleet, boat), iterator-1)
+				val inputBoatx = readLine().toInt
+				val inputBoaty = readLine().toInt
+				val orientation = readLine()
+				iterator match {
+					case 2 | 1 => {
+						val boat = Boat(orientation, iterator + 1, List(List(inputBoatx, inputBoaty)))
+						val newfleet = addToFleet(fleet, boat)
+						if(newfleet.length == fleet.length){
+							addFleetToPlayer(newfleet, iterator, new Random())
+						}
+						else{
+							addFleetToPlayer(newfleet, iterator - 1, new Random())
+						}
+					}
+					case _ => {
+						val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
+						val newfleet = addToFleet(fleet, boat)
+						if(newfleet.length == fleet.length){
+							addFleetToPlayer(newfleet, iterator, new Random())
+						}
+						else{
+							addFleetToPlayer(newfleet, iterator - 1, new Random())
+						}
+					}
+				}
+			}
+			else {
+				val inputBoatx = random.nextInt(10)
+				val inputBoaty = random.nextInt(10)
+				val orientation = listOr(random.nextInt(2))
+				iterator match {
+					case 2 | 1 => {
+						val boat = Boat(orientation, iterator + 1, List(List(inputBoatx, inputBoaty)))
+						val newfleet = addToFleet(fleet, boat)
+						if(newfleet.length == fleet.length){
+							addFleetToPlayer(newfleet, iterator, new Random(random.nextInt()))
+						}
+						else{
+							addFleetToPlayer(newfleet, iterator - 1, new Random(random.nextInt()))
+						}
+					}
+					case _ => {
+						val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
+						val newfleet = addToFleet(fleet, boat)
+						if(newfleet.length == fleet.length){
+							addFleetToPlayer(newfleet, iterator, new Random(random.nextInt()))
+						}
+						else{
+							addFleetToPlayer(newfleet, iterator - 1, new Random(random.nextInt()))
+						}
+					}
 				}
 			}
 		}
@@ -127,5 +195,6 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List()){
 	}
 
 }
+
 
 case class Hit(var pos: List[Int], var hitOrNot: Boolean)

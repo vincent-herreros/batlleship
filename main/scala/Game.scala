@@ -1,3 +1,5 @@
+import scala.util.Random
+
 object Game extends App{
 
 	val list1 = List(List(1,2), List(1,3), List(1,4))
@@ -21,7 +23,13 @@ object Game extends App{
 			mainloop(p1, p2, p1, 0, p2, 0)
 		}
 		case "2" =>	{
-
+			println("Nom du premier joueur : ")
+			val input1 = readLine()
+			println("Niveau de l'IA : ")
+			val input2 = readLine().toInt
+			val p1 = new Player(input1, List(), List())
+			val p2 = new Player("AI", List(), List(), input2)
+			mainloop(p1, p2, p1, 0, p2, 0)
 		}
 		case "3" => {
 
@@ -31,8 +39,8 @@ object Game extends App{
 	}
 
 	def mainloop(p1: Player, p2: Player, player1: Player, score1: Int, player2: Player, score2: Int): Unit= {
-		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(b1, b2), 0), List(new Hit(List(2, 2), true), new Hit(List(3, 2), false)))
-		val newp2 = new Player(p2.name, p2.addFleetToPlayer(List(b1), 0))
+		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(b1, b2), 0, new Random()), List(new Hit(List(2, 2), true), new Hit(List(3, 2), false)), p1.level)
+		val newp2 = new Player(p2.name, p2.addFleetToPlayer(List(), 5, new Random()),List() ,p2.level)
 		val winner = gameloop(newp1, newp2)
 		if(winner == newp1.name){
 			val newScore1 = score1+1
@@ -61,20 +69,38 @@ object Game extends App{
 		else{
 			println("grille de tir de "+p1.name)
 			displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), p1.shoots)
-			val shootx = readLine().toInt
-			val shooty = readLine().toInt
-			val newp2 = p1.shoot(List(shootx,shooty), p2)
-			if(newp2.isEmpty){
-				val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
-				println("Pas de touche")
-				gameloop(p2, newp1)
+			if(p1.level == 0){
+				val shootx = readLine().toInt
+				val shooty = readLine().toInt
+				val newp2 = p1.shoot(List(shootx,shooty), p2)
+				if(newp2.isEmpty){
+					val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
+					println("Pas de touche")
+					gameloop(p2, newp1)
+				}
+				else{
+					val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
+					println("touche")
+					val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
+					gameloop(newp3, newp1)
+				}
 			}
 			else{
-				val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
-				println("touche")
-				val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
-				gameloop(newp3, newp1)
+				val shoots = p1.shootAI(new Random())
+				val newp2 = p1.shoot(shoots, p2)
+				if(newp2.isEmpty){
+					val newp1 = p1.copy(shoots = (new Hit(shoots, false)::p1.shoots))
+					println("Pas de touche")
+					gameloop(p2, newp1)
+				}
+				else{
+					val newp1 = p1.copy(shoots = (new Hit(shoots, true)::p1.shoots))
+					println("touche")
+					val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
+					gameloop(newp3, newp1)
+				}
 			}
+
 		}
 		
 	}
