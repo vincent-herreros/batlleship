@@ -55,7 +55,16 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 	}
 
 	def shootAI3(hits: List[Hit], random: Random): List[Int] = {
-		List()
+		hits match{
+			case Nil => {
+				List(random.nextInt(10)+1, random.nextInt(10)+1)
+			}
+				case a::b =>{
+					//if(this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)){
+						List()
+			//	}
+		}
+	}
 	}
 
 	def boatShoot(posShoot: List[Int], fleet: List[Boat], nextFleet: List[Boat] = List()): Player = {
