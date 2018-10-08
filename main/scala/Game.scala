@@ -32,14 +32,20 @@ object Game extends App{
 			mainloop(p1, p2, p1, 0, p2, 0)
 		}
 		case "3" => {
-
+			println("Niveau de l'IA1 : ")
+			val input1 = readLine().toInt
+			println("Niveau de l'IA2 : ")
+			val input2 = readLine().toInt
+			val p1 = new Player("AI1", List(), List(), input1)
+			val p2 = new Player("AI2", List(), List(), input2)
+			mainloop(p1, p2, p1, 0, p2, 0)
 		}
 		case _ => {
 		}
 	}
 
 	def mainloop(p1: Player, p2: Player, player1: Player, score1: Int, player2: Player, score2: Int): Unit= {
-		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(b1, b2), 0, new Random()), List(new Hit(List(2, 2), true), new Hit(List(3, 2), false)), p1.level)
+		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(), 5, new Random()), List(), p1.level)
 		val newp2 = new Player(p2.name, p2.addFleetToPlayer(List(), 5, new Random()),List() ,p2.level)
 		val winner = gameloop(newp1, newp2)
 		if(winner == newp1.name){
@@ -81,7 +87,7 @@ object Game extends App{
 				else{
 					val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
 					println("touche")
-					val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
+					val newp3 = newp2.get.copy(fleet = newp2.get.deleteBoat(newp2.get.fleet, List()))
 					gameloop(newp3, newp1)
 				}
 			}
@@ -96,7 +102,7 @@ object Game extends App{
 				else{
 					val newp1 = p1.copy(shoots = (new Hit(shoots, true)::p1.shoots))
 					println("touche")
-					val newp3 = new Player(newp2.get.name, newp2.get.deleteBoat(newp2.get.fleet, List()), newp2.get.shoots)
+					val newp3 = newp2.get.copy(fleet = newp2.get.deleteBoat(newp2.get.fleet, List()))
 					gameloop(newp3, newp1)
 				}
 			}

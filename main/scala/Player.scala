@@ -26,7 +26,8 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 			}
 				case 2 => {
 					val posShoot = List(random.nextInt(10)+1, random.nextInt(10)+1)
-					val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)
+					val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
+					println(posHits)
 					if(posHits.contains(posShoot)){
 						shootAI(new Random(random.nextInt()))
 					}
@@ -34,14 +35,27 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 						posShoot
 					}
 				}
-				case x>2 => {
-					if(this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => y}.contains(true)){
-
+				case _ => {
+					val m = this.shoots.collect{case x if (x.hitOrNot==true) => x}
+					if(!m.isEmpty){
+						shootAI3(m, random)
+					}
+					else{
+						val posShoot = List(random.nextInt(10)+1, random.nextInt(10)+1)
+						val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)
+						if(posHits.contains(posShoot)){
+							shootAI(new Random(random.nextInt()))
+						}
+						else{
+							posShoot
+						}
 					}
 				}
 		}
+	}
 
-
+	def shootAI3(hits: List[Hit], random: Random): List[Int] = {
+		List()
 	}
 
 	def boatShoot(posShoot: List[Int], fleet: List[Boat], nextFleet: List[Boat] = List()): Player = {
@@ -165,7 +179,7 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 				true
 			}
 			case a::b =>{
-				if(boat.isOverlapping(a, boat.listPos)){
+				if(!boat.isOverlapping(a, boat.listPos)){
 					verifFleet(fleet.tail, boat)
 				}
 				else{
