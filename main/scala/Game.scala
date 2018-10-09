@@ -50,19 +50,40 @@ object Game extends App{
 		val winner = gameloop(newp1, newp2)
 		if(winner == newp1.name){
 			val newScore1 = score1+1
-			println(player1.name + " : "+newScore1+ "     "+player2.name+" : "+score2)
-			val input = readLine("Play again ?")
-			if(input=="y"){
-				mainloop(newp2, newp1, newp2, score2,newp1, newScore1)
+			if(p1.level==0 || p2.level == 0){
+				println(player1.name + " : "+newScore1+ "     "+player2.name+" : "+score2)
+				val input = readLine("Play again ?")
+				if(input=="y"){
+					mainloop(newp2, newp1, newp2, score2,newp1, newScore1)
+				}
+			}
+			else{
+				if(newScore1 +score2 < 100){
+					mainloop(newp2, newp1, newp2, score2,newp1, newScore1)
+				}
+				else{
+					println(player1.name + " : "+newScore1+ "     "+player2.name+" : "+score2)
+				}
 			}
 		}
 		else{
 			val newScore2 = score2+1
-			println(player1.name + " : "+score1+ "     "+player2.name+" : "+newScore2)
-			val input = readLine("Play again ?")
-			if(input=="y"){
-				mainloop(newp2, newp1, newp2, newScore2,newp1, score1)
+			if(p1.level==0 || p2.level==0){
+				println(player1.name + " : "+score1+ "     "+player2.name+" : "+newScore2)
+				val input = readLine("Play again ?")
+				if(input=="y"){
+					mainloop(newp2, newp1, newp2, newScore2,newp1, score1)
+				}
 			}
+			else{
+				if(score1 + newScore2 < 100){
+					mainloop(newp2, newp1, newp2, newScore2,newp1, score1)
+				}
+				else{
+					println(player1.name + " : "+score1+ "     "+player2.name+" : "+newScore2)
+				}
+			}
+
 		}
 
 	}
@@ -73,20 +94,20 @@ object Game extends App{
 			p2.name
 		}
 		else{
-			println("grille de tir de "+p1.name)
-			displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), p1.shoots)
+			if(p1.level==0){
+				println("grille de tir de "+p1.name)
+				displayLines(10, 10, p1.fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), p1.shoots)
+			}
 			if(p1.level == 0){
 				val shootx = readLine().toInt
 				val shooty = readLine().toInt
 				val newp2 = p1.shoot(List(shootx,shooty), p2)
 				if(newp2.isEmpty){
 					val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), false)::p1.shoots))
-					println("Pas de touche")
 					gameloop(p2, newp1)
 				}
 				else{
 					val newp1 = p1.copy(shoots = (new Hit(List(shootx,shooty), true)::p1.shoots))
-					println("touche")
 					val newp3 = newp2.get.copy(fleet = newp2.get.deleteBoat(newp2.get.fleet, List()))
 					gameloop(newp3, newp1)
 				}
@@ -96,12 +117,10 @@ object Game extends App{
 				val newp2 = p1.shoot(shoots, p2)
 				if(newp2.isEmpty){
 					val newp1 = p1.copy(shoots = (new Hit(shoots, false)::p1.shoots))
-					println("Pas de touche")
 					gameloop(p2, newp1)
 				}
 				else{
 					val newp1 = p1.copy(shoots = (new Hit(shoots, true)::p1.shoots))
-					println("touche")
 					val newp3 = newp2.get.copy(fleet = newp2.get.deleteBoat(newp2.get.fleet, List()))
 					gameloop(newp3, newp1)
 				}

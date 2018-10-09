@@ -25,15 +25,10 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 				List(random.nextInt(10)+1, random.nextInt(10)+1)
 			}
 				case 2 => {
-					val posShoot = List(random.nextInt(10)+1, random.nextInt(10)+1)
 					val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
-					println(posHits)
-					if(posHits.contains(posShoot)){
-						shootAI(new Random(random.nextInt()))
-					}
-					else{
-						posShoot
-					}
+					val possibleHits = getPossibleHits(posHits, 10, 10, List())
+					possibleHits(random.nextInt(possibleHits.length))
+
 				}
 				case _ => {
 					val m = this.shoots.collect{case x if (x.hitOrNot==true) => x}
@@ -41,30 +36,71 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 						shootAI3(m, random)
 					}
 					else{
-						val posShoot = List(random.nextInt(10)+1, random.nextInt(10)+1)
-						val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)
-						if(posHits.contains(posShoot)){
-							shootAI(new Random(random.nextInt()))
-						}
-						else{
-							posShoot
-						}
+						val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
+						val possibleHits = getPossibleHits(posHits, 10, 10, List())
+						possibleHits(random.nextInt(possibleHits.length))
 					}
 				}
 		}
 	}
 
 	def shootAI3(hits: List[Hit], random: Random): List[Int] = {
+		val shoots = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
 		hits match{
 			case Nil => {
-				List(random.nextInt(10)+1, random.nextInt(10)+1)
+				val posHits = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
+				val possibleHits = getPossibleHits(posHits, 10, 10, List())
+				possibleHits(random.nextInt(possibleHits.length))
 			}
 				case a::b =>{
-					//if(this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}.flatMap(x => x)){
-						List()
-			//	}
+						if(shoots.contains(List(a.pos(0), a.pos(1)+1)) || a.pos(1)+1 > 10){
+							if(shoots.contains(List(a.pos(0), a.pos(1)-1)) || a.pos(1)-1 < 1){
+								if(shoots.contains(List(a.pos(0)+1, a.pos(1))) || a.pos(0)+1 >10){
+									if(shoots.contains(List(a.pos(0)-1, a.pos(1))) || a.pos(0)-1 < 1){
+										shootAI3(hits.tail, random)
+									}
+									else{
+										List(a.pos(0)-1, a.pos(1))
+									}
+								}
+								else{
+										List(a.pos(0)+1, a.pos(1))
+								}
+							}
+							else{
+									List(a.pos(0), a.pos(1)-1)
+							}
+						}
+					else{
+								List(a.pos(0), a.pos(1)+1)
+						}
+					}
+				}
+
+	}
+
+	def getPossibleHits(list: List[List[Int]], lines: Int, colums: Int, possibleHits: List[List[Int]]): List[List[Int]] ={
+		if(lines>0){
+			val result = getPossibleHitsCol(list, lines, colums, possibleHits)
+			getPossibleHits(list, lines-1, colums, result)
+		}
+		else{
+			possibleHits
 		}
 	}
+
+	def getPossibleHitsCol(list: List[List[Int]], line: Int, colums: Int, possibleHits: List[List[Int]]): List[List[Int]] ={
+		if(colums>0){
+			if(list.contains(List(line, colums))){
+				getPossibleHitsCol(list, line, colums-1, possibleHits)
+			}
+			else{
+				getPossibleHitsCol(list, line, colums-1, List(line, colums)::possibleHits)
+			}
+		}
+		else{
+			possibleHits
+		}
 	}
 
 	def boatShoot(posShoot: List[Int], fleet: List[Boat], nextFleet: List[Boat] = List()): Player = {
