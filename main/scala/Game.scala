@@ -155,7 +155,7 @@ object Game extends App{
 								print(Console.RED_B+"  "+Console.RESET)
 							}
 							else{
-								print(Console.BLUE_B+Console.WHITE+" x"+Console.RESET)
+								print(Console.BLUE_B+Console.BLACK+" x"+Console.RESET)
 							}
 							displayColumns(colums-1, List(),hits.tail:::nextHits, List(), hitOrBoat)
 						}
