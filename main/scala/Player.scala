@@ -1,5 +1,12 @@
 import scala.util.Random
 
+/**
+	*
+	* @param name
+	* @param fleet
+	* @param shoots
+	* @param level
+	*/
 case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), level: Int= 0){
 
 	def shoot(posShoot: List[Int], enemyP: Player): Option[Player] = {
@@ -125,6 +132,7 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		if(iterator>0) {
 			val listOr = Array("h", "v")
 			if (this.level==0) {
+				Game.displayLines(10,10, fleet.map(x => (x.life, x.listPos.flatMap(x => x))).collect{ case (x, y) => y}.flatMap(x => x), List())
 				iterator match {
 					case 5 => {
 						println("Ajoutez un bateau de 5")
@@ -142,28 +150,37 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 
 					}
 				}
-				val inputBoatx = readLine().toInt
-				val inputBoaty = readLine().toInt
+				val valinputBoatx = readLine()
+				val valinputBoaty = readLine()
 				val orientation = readLine()
-				iterator match {
-					case 2 | 1 => {
-						val boat = Boat(orientation, iterator + 1, List(List(inputBoatx, inputBoaty)))
-						val newfleet = addToFleet(fleet, boat)
-						if(newfleet.length == fleet.length){
-							addFleetToPlayer(newfleet, iterator, new Random())
+				val inputBoatx = Game.matchingNumbers(valinputBoatx)
+				val inputBoaty = Game.matchingNumbers(valinputBoaty)
+				if(inputBoatx.isEmpty || inputBoaty.isEmpty || (orientation != "v" && orientation != "h")){
+					println(inputBoatx+"  "+inputBoaty+"  "+orientation)
+					println("Mauvaise coordonnée ou orientation")
+					this.addFleetToPlayer(fleet, iterator, random)
+				}
+				else{
+					iterator match {
+						case 2 | 1 => {
+							val boat = Boat(orientation, iterator + 1, List(List(inputBoatx.get, inputBoaty.get)))
+							val newfleet = addToFleet(fleet, boat)
+							if(newfleet.length == fleet.length){
+								addFleetToPlayer(newfleet, iterator, new Random())
+							}
+							else{
+								addFleetToPlayer(newfleet, iterator - 1, new Random())
+							}
 						}
-						else{
-							addFleetToPlayer(newfleet, iterator - 1, new Random())
-						}
-					}
-					case _ => {
-						val boat = Boat(orientation, iterator, List(List(inputBoatx, inputBoaty)))
-						val newfleet = addToFleet(fleet, boat)
-						if(newfleet.length == fleet.length){
-							addFleetToPlayer(newfleet, iterator, new Random())
-						}
-						else{
-							addFleetToPlayer(newfleet, iterator - 1, new Random())
+						case _ => {
+							val boat = Boat(orientation, iterator, List(List(inputBoatx.get, inputBoaty.get)))
+							val newfleet = addToFleet(fleet, boat)
+							if(newfleet.length == fleet.length){
+								addFleetToPlayer(newfleet, iterator, new Random())
+							}
+							else{
+								addFleetToPlayer(newfleet, iterator - 1, new Random())
+							}
 						}
 					}
 				}

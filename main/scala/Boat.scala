@@ -1,6 +1,16 @@
+/**
+	* Boat class
+	* @param life
+	* @param listPos list of a lists containing the x and y of each position of the boat
+	*/
 case class Boat(var life: Int, var listPos: List[List[Int]]){
 
-
+	/**
+		* Tell if the boat created is in the gris of 10x10 or not
+		* @param gridSize the size of the grid
+		* @param newListPos list who needs to be check
+		* @return true if the boat is in the grid, false if not
+		*/
 	def isInTheGrid(gridSize: Int, newListPos: List[List[Int]]): Boolean = {
 		newListPos match{
 			case (a :: (b :: Nil))::Nil => {
@@ -24,6 +34,12 @@ case class Boat(var life: Int, var listPos: List[List[Int]]){
 
 	}
 
+	/**
+		* Tell if a boat is overlapping a other one
+		* @param boat the other boat to check
+		* @param listPos list of the position of the current boat who needs to be check
+		* @return true if is overlapping, false if not
+		*/
 	def isOverlapping(boat: Boat, listPos:List[List[Int]]): Boolean={
 		listPos match{
 			case Nil => {
@@ -44,6 +60,13 @@ case class Boat(var life: Int, var listPos: List[List[Int]]){
 }
 
 object Boat {
+	/**
+		* function to create a automatically a boat with an orientation, a life and the origin
+		* @param orientation v for vertical, h for horizontal
+		* @param life the number of position which the boat will be have
+		* @param listPos the list of position of the boat
+		* @return if the boat created is in the grid, return it, if not, return None
+		*/
 	def apply(orientation: String, life: Int, listPos: List[List[Int]]): Option[Boat] = {
 		if(life>1){
 			orientation match{
