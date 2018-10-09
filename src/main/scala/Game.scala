@@ -1,4 +1,7 @@
 import scala.util.Random
+import java.io.{BufferedWriter, FileWriter}
+import java.io.File
+import com.github.tototoshi.csv._
 
 /**
   * the main app which launch the game
@@ -10,6 +13,8 @@ object Game extends App{
 	println("AI VS AI")
 	println("Quit : q")
 	val inputMenu = readLine("")
+	val f = new File("out.csv")
+	val writer = CSVWriter.open(f)
 	inputMenu match{
 		case "1" =>	{
 			println("Nom du premier joueur : ")
@@ -35,11 +40,13 @@ object Game extends App{
       }
 		}
 		case "3" => {
-			val p1 = new Player("AI1", List(), List(), 1)
-			val p2 = new Player("AI2", List(), List(), 2)
+			writer.writeRow(List("AI Name", "score", "AI Name2", "score2"))
+			val p1 = new Player("AI level 1", List(), List(), 1)
+			val p2 = new Player("AI level 2", List(), List(), 2)
 			mainloop(p1, p2, p1, 0, p2, 0)
-			mainloop(p1, p2.copy(level = 3), p1, 0, p2, 0)
-			mainloop(p1.copy(level = 2), p2.copy(level = 3), p1, 0, p2, 0)
+			mainloop(p1, p2.copy(name = "AI level 3", level = 3), p1, 0, p2, 0)
+			mainloop(p1.copy(name = "AI level 2", level = 2), p2.copy(name = "AI level 3", level = 3), p1, 0, p2, 0)
+			writer.close()
 		}
 		case _ => {
 		}
@@ -72,7 +79,7 @@ object Game extends App{
 					mainloop(newp2, newp1, newp2, score2,newp1, newScore1)
 				}
 				else{
-					println(player1.name + " : "+newScore1+ "     "+player2.name+" : "+score2)
+					writer.writeRow(List(player1.name, newScore1.toString, player2.name, score2.toString))
 				}
 			}
 		}
@@ -90,7 +97,7 @@ object Game extends App{
 					mainloop(newp2, newp1, newp2, newScore2,newp1, score1)
 				}
 				else{
-					println(player1.name + " : "+score1+ "     "+player2.name+" : "+newScore2)
+					writer.writeRow(List(player1.name, score1.toString, player2.name, newScore2.toString))
 				}
 			}
 
@@ -312,5 +319,6 @@ object Game extends App{
 			}
 		}
 	}
+
 
 }
