@@ -1,11 +1,9 @@
 import scala.util.Random
 
+/**
+  * the main app which launch the game
+  */
 object Game extends App{
-
-	val list1 = List(List(1,2), List(1,3), List(1,4))
-	val list2 = List(List(5,4), List(6,4), List(7,4))
-	val b1 = Boat(3, list1)
-	val b2 = Boat(3, list2)
 	println("Choose your game mode")
 	println("Player VS Player : 1")
 	println("Player VS AI : 2")
@@ -47,6 +45,15 @@ object Game extends App{
 		}
 	}
 
+  /**
+    * the mainloop of the game, for add all the boat of each player and repeat the game if the players want it
+    * @param p1 player 1
+    * @param p2 player 2
+    * @param player1 player 1, to keep which one is the beginner
+    * @param score1 score of player 1
+    * @param player2 player 2, to keep which one is the beginner
+    * @param score2 score of the player 2
+    */
 	def mainloop(p1: Player, p2: Player, player1: Player, score1: Int, player2: Player, score2: Int): Unit= {
 		val newp1 = new Player(p1.name, p1.addFleetToPlayer(List(), 5, new Random()), List(), p1.level)
 		val newp2 = new Player(p2.name, p2.addFleetToPlayer(List(), 5, new Random()),List() ,p2.level)
@@ -91,6 +98,12 @@ object Game extends App{
 
 	}
 
+  /**
+    * loop of the game, where players shoot
+    * @param p1 player 1, change every turn
+    * @param p2 player 2, change every turn
+    * @return
+    */
 	def gameloop(p1: Player, p2: Player): String = {
 		if(p1.fleet.isEmpty){
 			p2.name
@@ -141,6 +154,14 @@ object Game extends App{
 	}
 
 
+  /**
+    * display of the game for a player
+    * @param colums colums of the grid
+    * @param posBoat position of each Boat to display
+    * @param hits list of hit to display
+    * @param nextHits hits still waiting to display
+    * @param hitOrBoat true if display hit, false if display boat
+    */
 	def displayColumns(colums: Int, posBoat: List[Int] = List(), hits: List[Hit] = List(), nextHits: List[Hit] = List(), hitOrBoat: Boolean): Unit = {
 		if(colums>0){
 			if(hitOrBoat){
@@ -179,6 +200,13 @@ object Game extends App{
 		}
 	}
 
+  /**
+    * display for the game, which call display colums
+    * @param colums number of colums
+    * @param lines number of lines
+    * @param posBoat list of boat to display
+    * @param hits hits to display
+    */
 	def displayLines(colums: Int, lines: Int, posBoat:List[Int] = List(), hits: List[Hit] = List()): Unit = {
 		if(lines == 10){
 			println("  A B C D E F G H I J            A B C D E F G H I J")
@@ -199,6 +227,11 @@ object Game extends App{
 		}
 	}
 
+  /**
+    * function to change number in letters
+    * @param value value to change
+    * @return the corresponding letter, None otherwise
+    */
 	def matchingLetters(value: Int): Option[String] ={
 		value match{
 			case 1 =>{
@@ -237,6 +270,11 @@ object Game extends App{
 		}
 	}
 
+  /**
+    * change letters in numbers
+    * @param value value to change
+    * @return the correspnding number, None otherwise
+    */
 	def matchingNumbers(value: String): Option[Int] = {
 		value match{
 			case "A" =>{

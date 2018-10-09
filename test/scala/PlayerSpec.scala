@@ -69,4 +69,40 @@ class PlayerSpec extends FlatSpec with Matchers {
     p1.getPossibleHitsCol(List(List(4,5)), 10, 10, List()).length should be(10)
     p1.getPossibleHitsCol(List(List(4,5)), 4, 10, List()).length should be(9)
   }
+
+  "The player object" should "Boat shoot" in{
+    val p1 = new Player("4", List(Boat("h", 3, List(List(1,2))).get), List(new Hit(List(4,5), false)), 3)
+    val p2 = p1.boatShoot(List(1,2), p1.fleet, List())
+    p2.fleet.head.listPos.length should be (p1.fleet.head.listPos.length-1)
+    p2.boatShoot(List(9,9), p2.fleet, List()).fleet.head.listPos.length should be (p2.fleet.head.listPos.length)
+  }
+
+  "The player object" should "addFleetToPlayer" in{
+    val p1 = new Player("4", List(), List(), 3)
+    val f = p1.addFleetToPlayer(List(), 5, new Random())
+    f.length should be (5)
+    f.head.listPos.length should be(2)
+  }
+
+  "The player object" should "addToFleet" in{
+    val p1 = new Player("4", List(), List(), 3)
+    p1.addToFleet(p1.fleet, Boat("v", 3, List(List(1,2)))).length should be (1)
+    p1.addToFleet(p1.fleet, Boat("h", 4, List(List(10, 10)))).length should be (0)
+  }
+
+  "The player object" should "verifFleet" in{
+    val p1 = new Player("4", List(Boat("h", 3, List(List(1,2))).get), List(), 3)
+    p1.verifFleet(p1.fleet, Boat("v", 3, List(List(1,2))).get) should be(false)
+    p1.verifFleet(p1.fleet, Boat("v", 3, List(List(2,1))).get) should be(false)
+    p1.verifFleet(p1.fleet, Boat("v", 3, List(List(5,5))).get) should be(true)
+  }
+
+  "The player object" should "delete boat" in{
+    val p1 = new Player("4", List(new Boat(3, List()), Boat("h", 3, List(List(4,4))).get), List(), 3)
+    p1.fleet.length should be(2)
+    p1.deleteBoat(p1.fleet, List()).length should be(1)
+    val p2 = new Player("4", List(Boat("h", 3, List(List(1,2))).get), List(), 3)
+    p2.deleteBoat(p2.fleet, List()).length should be(1)
+
+  }
 }

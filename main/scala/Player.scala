@@ -1,14 +1,20 @@
 import scala.util.Random
 
 /**
-	*
-	* @param name
-	* @param fleet
-	* @param shoots
-	* @param level
+	*Class player which could be a human or an AI
+	* @param name name of the player
+	* @param fleet fleet which contains the boat of the player
+	* @param shoots list of shoots
+	* @param level level of the AI, 1, 2 or 3, 0 for an human
 	*/
 case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), level: Int= 0){
 
+	/**
+		* function which take positions and shoot on the enemy fleet
+		* @param posShoot position of the shoot enter by the player
+		* @param enemyP enemy player to compare the boat and the postion of the shoot
+		* @return enemy player, change if the shoot hits, unchange if no hit
+		*/
 	def shoot(posShoot: List[Int], enemyP: Player): Option[Player] = {
 		val posHits = shoots.map(x =>x.pos)
 		if(shoots.contains(posShoot)){
@@ -26,6 +32,14 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* function for the AI shoot with a random shoot
+		* if tha AI is level 1, the shoot is fully random
+		* if the AI is level 2, the shoot is random but the AI remind where it shoots before
+		* if the AI is level 3, call shootAI3
+		* @param random random class
+		* @return return the position of the shoot
+		*/
 	def shootAI(random: Random): List[Int] ={
 		this.level match{
 			case 1 => {
@@ -51,6 +65,14 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* function for the AI level 3
+		* priority select a position next to a true hit
+		* then find a random position which was not be already hit
+		* @param hits List of true hit
+		* @param random random class
+		* @return position of the shoot
+		*/
 	def shootAI3(hits: List[Hit], random: Random): List[Int] = {
 		val shoots = this.shoots.map(x => (x.pos, x.hitOrNot)).collect{case (x, y) => x}
 		hits match{
@@ -86,6 +108,14 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 
 	}
 
+	/**
+		* function to have all the possible hit for the AI 2 and 3, to avoid a infinite randomly search
+		* @param list List of shoot
+		* @param lines lines of the grid
+		* @param colums colums of the grid
+		* @param possibleHits List of the possible hit
+		* @return List of possible position for the shoot
+		*/
 	def getPossibleHits(list: List[List[Int]], lines: Int, colums: Int, possibleHits: List[List[Int]]): List[List[Int]] ={
 		if(lines>0){
 			val result = getPossibleHitsCol(list, lines, colums, possibleHits)
@@ -96,6 +126,14 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* same as getPossibleHits, just add the free postion to a list
+		* @param list list of position already taken in the line
+		* @param line number of the line
+		* @param colums colums of the grid
+		* @param possibleHits List of the possible hit
+		* @return List of the possible position for the shoot
+		*/
 	def getPossibleHitsCol(list: List[List[Int]], line: Int, colums: Int, possibleHits: List[List[Int]]): List[List[Int]] ={
 		if(colums>0){
 			if(list.contains(List(line, colums))){
@@ -110,6 +148,13 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* check if the fleet of the player is shoot by the shoot of the other player
+		* @param posShoot shoot of the player 1
+		* @param fleet fleet of the player 2
+		* @param nextFleet rest of the fleet not hit by the shoot
+		* @return return player 2, change if shoot, unchange if the shoot miss
+		*/
 	def boatShoot(posShoot: List[Int], fleet: List[Boat], nextFleet: List[Boat] = List()): Player = {
 		fleet match{
 			case Nil =>{
@@ -128,6 +173,14 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* function which asks to a player to add all the boat
+		* If the player is the Ai, the placement is random
+		* @param fleet the fleet where to add the boat
+		* @param iterator the number of boat to add
+		* @param random random class
+		* @return a list of boat fully of boat correctly generated
+		*/
 	def addFleetToPlayer(fleet: List[Boat], iterator: Int, random: Random): List[Boat] = {
 		if(iterator>0) {
 			val listOr = Array("h", "v")
@@ -220,6 +273,12 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		
 	}
 
+	/**
+		* the function which really add a boat to the fleet and check if it's possible by calling verifFleet
+		* @param fleet where the boat is added
+		* @param boat the boat to add
+		* @return the new fleet with the boat, or if the boat is overlapping an otherone, the old fleet
+		*/
 	def addToFleet(fleet: List[Boat], boat: Option[Boat]): List[Boat] = {
 		if(boat.isEmpty){
 			fleet
@@ -235,6 +294,12 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		
 	}
 
+	/**
+		* verif if the boat can be added to the fleet
+		* @param fleet the place where the boat is added
+		* @param boat the boat to add
+		* @return true if the boat can be add, false if not
+		*/
 	def verifFleet(fleet: List[Boat], boat: Boat): Boolean ={
 		fleet match {
 			case Nil => {
@@ -254,6 +319,12 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 		}
 	}
 
+	/**
+		* check the fleet of the player, if a boat contains a empty list of position, delete it
+		* @param fleet fleet to check
+		* @param newfleet the new fleet
+		* @return the same fleet if there are no empty boat, a new fleet minus one boat if this one is empty
+		*/
 	def deleteBoat(fleet: List[Boat], newfleet: List[Boat]): List[Boat] = {
 		fleet match{
 			case Nil => {
@@ -271,6 +342,3 @@ case class Player(name: String, fleet: List[Boat], shoots: List[Hit] = List(), l
 	}
 
 }
-
-
-case class Hit(var pos: List[Int], var hitOrNot: Boolean)
